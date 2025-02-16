@@ -1,0 +1,44 @@
+{
+  "name": "back",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/Laxical/Privy-server-wallet#readme",
+  "bugs": {
+    "url": "https://github.com/Laxical/Privy-server-wallet/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Laxical/Privy-server-wallet.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc -b",
+    "start": "node ./dist/index.js"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/multer": "^1.4.12",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "@privy-io/server-auth": "^1.18.4",
+    "@vercel/node": "^5.1.2",
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "https": "^1.0.0",
+    "mongoose": "^8.9.7",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^3.1.9",
+    "pinata-web3": "^0.5.4",
+    "uuid": "^11.0.5",
+    "viem": "^2.22.22"
+  }
+}
