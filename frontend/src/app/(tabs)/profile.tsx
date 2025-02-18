@@ -3,6 +3,8 @@
 import { usePrivy } from "@privy-io/expo"
 import { Pressable, Text, View, SafeAreaView, ScrollView } from "react-native"
 import { StatusBar } from "expo-status-bar"
+import { router } from 'expo-router' // Change this import
+
 
 export default function Profile() {
   const { user } = usePrivy()
@@ -14,8 +16,11 @@ export default function Profile() {
         <View className="p-6">
           <Text className="text-4xl font-bold text-blue-600 mb-6">Profile</Text>
         </View>
-        <Pressable className="">
-          <Text>
+        <Pressable 
+          className="bg-blue-500 p-3 rounded-lg shadow-lg active:bg-blue-600 w-40"
+          onPress={() => router.push('/(ens)/register')} // Update the path format
+        >
+          <Text className="text-white text-centre">
             Register ENS
           </Text>
         </Pressable>

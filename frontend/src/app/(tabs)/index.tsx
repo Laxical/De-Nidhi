@@ -8,7 +8,7 @@ import { StatusBar } from "expo-status-bar"
 import { ETHERSCAN_API_KEY, USDC_ADDRESS, BACKEND_URL } from '@env';
 import "react-native-get-random-values";
 import "react-native-url-polyfill/auto";
-import provider from "@/config/etherconfig"
+import {provider} from "@/config/etherconfig"
 
 
 export default function Page() {

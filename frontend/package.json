@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "entrypoint.js",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start ",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
@@ -13,6 +13,7 @@
     "@expo-google-fonts/inter": "^0.2.3",
     "@privy-io/expo": "^0.47.0",
     "@privy-io/expo-native-extensions": "^0.0.3",
+    "@react-native-picker/picker": "^2.11.0",
     "ethers": "^6.13.5",
     "expo": "~52.0.27",
     "expo-application": "~6.0.2",
