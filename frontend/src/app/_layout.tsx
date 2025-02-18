@@ -15,7 +15,17 @@ export default function RootLayout() {
   });
 
   return (
-    <PrivyProvider appId={PRIVY_APP_ID} clientId={PRIVY_CLIENT_ID}>
+    <PrivyProvider 
+      appId={PRIVY_APP_ID} 
+      clientId={PRIVY_CLIENT_ID}
+      config={{
+        embedded: { 
+          ethereum: { 
+            createOnLogin: 'users-without-wallets',
+          }, 
+        }, 
+      }}
+    >
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="transactions" />

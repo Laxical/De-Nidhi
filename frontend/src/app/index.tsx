@@ -2,13 +2,16 @@
 
 import { useLogin, usePrivy } from "@privy-io/expo"
 import { Link } from "expo-router"
-import { useEffect } from "react"
-import { Pressable, Text, View, SafeAreaView, ScrollView } from "react-native"
+import { useEffect, useState } from "react"
+import { Pressable, Text, View, SafeAreaView, ScrollView, Linking } from "react-native"
 import { StatusBar } from "expo-status-bar"
 import { Ionicons } from "@expo/vector-icons"
 import Constants from "expo-constants"
+import { ETHERSCAN_API_KEY, USDC_ADDRESS } from '@env';
+
 
 export default function Page() {
+  const [usdcBalance, setUsdcBalance] = useState(null);
   const { user, logout } = usePrivy()
   const { login } = useLogin()
 
@@ -25,6 +28,63 @@ export default function Page() {
     }
   }
 
+  const handleBuyUSDC = async () => {
+    try {
+      const response = await fetch("http://10.1.8.239:5000/api/circle/BUY", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${process.env.CIRCLE_API_KEY}`,
+        },
+        body: JSON.stringify({userAddress: user.linked_accounts[1].address})
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if(data.url.data.walletAddress.address === user.linked_accounts[1].address) {
+          Linking.openURL(data.url.data.url);
+        } else {
+          console.error("Wallet address mismatch");
+        }
+      } else {
+        console.error("Failed to create ramp session");
+      }
+    } catch (error) {
+      console.error("Error creating ramp session:", error);
+    }
+  };
+
+  const fetchUsdcBalance = async (address) => {
+    console.log("here");
+    try {
+      const response = await fetch(`https://api-sepolia.etherscan.io/api?module=account&action=tokenbalance&contractaddress=${USDC_ADDRESS}&address=${address}&tag=latest&apikey=${ETHERSCAN_API_KEY}`);
+
+      const data = await response.json();
+      console.log(data);
+
+      if (data.status === "1") {
+        const balance = data.result;
+        setUsdcBalance(balance / 1e6); // USDC has 6 decimals
+      } else {
+        console.error("Error fetching balance:", data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching USDC balance:", error);
+    }
+  };
+
+  const handleSendUSDC = async () => {
+
+  };
+
+  useEffect(() => {
+    console.log(user);
+    if (user) {
+      fetchUsdcBalance(user.linked_accounts[1].address);
+    }
+  },[user]);
+
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
       <StatusBar style="dark" />
@@ -35,11 +95,11 @@ export default function Page() {
 
           {user ? (
             <View className="bg-white rounded-lg shadow-md p-4 mb-6">
-              <Text className="text-lg font-semibold mb-2">Welcome, {user.name || "User"}!</Text>
-              <Text className="text-gray-600 mb-2">Balance: 0.00 ETH</Text>
+              <Text className="text-lg font-semibold mb-2">Welcome, {user.linked_accounts[0].address || "User"}!</Text>
+              <Text className="text-gray-600 mb-2">Balance: {usdcBalance} USDC</Text>
               <Link href="/send-money" asChild>
-                <Pressable className="bg-blue-500 py-2 px-4 rounded-full">
-                  <Text className="text-white text-center font-semibold">Send Money</Text>
+                <Pressable className="bg-blue-500 py-2 px-4 rounded-full" onPress={handleSendUSDC}>
+                  <Text className="text-white text-center font-semibold">Send USDC</Text>
                 </Pressable>
               </Link>
             </View>
@@ -48,6 +108,13 @@ export default function Page() {
               <Text className="text-lg text-center mb-4">Login to start sending and receiving crypto!</Text>
             </View>
           )}
+
+          {user && <Pressable
+            onPress={handleBuyUSDC}
+            className={`py-3 px-6 rounded-full bg-green-500 mb-6 mx-10`}
+          >
+            <Text className="text-white text-center font-semibold">Buy USDC</Text>
+          </Pressable>}
 
           <Pressable
             onPress={handleAuthAction}
@@ -90,4 +157,3 @@ export default function Page() {
     </SafeAreaView>
   )
 }
-
