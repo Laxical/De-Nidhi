@@ -8,8 +8,6 @@ import { StatusBar } from "expo-status-bar"
 import { Ionicons } from "@expo/vector-icons"
 import Constants from "expo-constants"
 import { ETHERSCAN_API_KEY, USDC_ADDRESS, BACKEND_URL } from '@env';
-import { useEnsName } from 'wagmi'
-
 export default function Page() {
   const [usdcBalance, setUsdcBalance] = useState(null);
   const { user, logout } = usePrivy()
