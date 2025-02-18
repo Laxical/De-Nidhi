@@ -9,7 +9,8 @@ import { ETHERSCAN_API_KEY, USDC_ADDRESS, BACKEND_URL } from '@env';
 import "react-native-get-random-values";
 import "react-native-url-polyfill/auto";
 import provider from "@/config/etherconfig"
-
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export default function Page() {
   const [usdcBalance, setUsdcBalance] = useState(null);
@@ -77,7 +78,7 @@ export default function Page() {
 
       if (data.status === "1") {
         const balance = data.result;
-        setUsdcBalance(balance / 1e6); // USDC has 6 decimals
+        setUsdcBalance(balance / 1e6);
       } else {
         console.error("Error fetching balance:", data.message);
       }
@@ -123,14 +124,14 @@ export default function Page() {
             onPress={handleBuyUSDC}
             className={`py-3 px-6 rounded-full bg-green-500 mb-6 mx-10`}
           >
-            <Text className="text-white text-center font-semibold">Buy USDC</Text>
+            <Text className="text-white text-center font-semibold flex justify-center items-center"><FontAwesome name="dollar" size={14} color="white" /> Buy USDC</Text>
           </Pressable>}
 
           <Pressable
             onPress={handleAuthAction}
             className={`py-3 px-6 rounded-full ${user ? "bg-red-500" : "bg-blue-500"}`}
           >
-            <Text className="text-white text-center font-semibold">{user ? "Logout" : "Login"}</Text>
+            <Text className="text-white text-center font-semibold">{user ? (<Text className="flex justify-center items-center"><MaterialIcons name="logout" size={16} color="white" /> Logout</Text>) : "Login"}</Text>
           </Pressable>
          
 

@@ -4,14 +4,21 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Pressable, Text, View } from "react-native"
 import { Link } from "expo-router"
 import Constants from "expo-constants"
+import Feather from '@expo/vector-icons/Feather';
 
 function TabLayout() {
     return (
       <View className="flex-row justify-around py-4 bg-white border-t border-gray-200">
         <Link href="/" asChild>
           <Pressable className="items-center">
-            <Ionicons name="home" size={24} color="black" />
+            <Ionicons name="home-outline" size={24} color="black" />
             <Text className="text-xs mt-1">Home</Text>
+          </Pressable>
+        </Link>
+        <Link href="/chats" asChild>
+          <Pressable className="items-center">
+            <Feather name="send" size={24} color="black" />
+            <Text className="text-xs mt-1">Chat</Text>
           </Pressable>
         </Link>
         <Link href="/transactions" asChild>
@@ -36,6 +43,7 @@ export default function TabsLayout() {
         <View style={{ height: Constants.statusBarHeight }} className="bg-gray-100" />
         <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" />
+            <Stack.Screen name="chats" />
             <Stack.Screen name="profile" />
             <Stack.Screen name="transactions" />
         </Stack>
