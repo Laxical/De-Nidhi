@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-    name: String,
-    circleBankAccountId: String,
-    walletAddress: String,
+  userAddress: { type: String, required: true, unique: true },
+  socketId: { type: String, default: "" },
+  isActive: { type: Boolean, default: false }, 
 });
 
 const User = mongoose.model('User', userSchema);

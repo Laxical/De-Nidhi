@@ -2,6 +2,9 @@ import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
+import http from "http";
+import { Server } from "socket.io";
+import User from "./schema/userSchema";
 
 dotenv.config();
 mongoose.connect(process.env.MONGO_URI || "");
@@ -14,10 +17,62 @@ db.once("open", () => {
 });
 
 const app = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
 
 app.use(express.json());
 app.use(cors());
+
+io.on("connection", async (socket) => {
+  console.log("A user connected:", socket.id);
+
+  socket.on("register", async (userAddress) => {
+    try {
+      const user = await User.findOneAndUpdate(
+        { userAddress: userAddress },
+        { socketId: socket.id, isActive: true },
+        { new: true, upsert: true }
+      );
+
+      console.log(`User ${userAddress} is now active with socketId: ${socket.id}`);
+    } catch (error) {
+      console.error("Error in user connect status update:", error);
+    }
+  });
+
+  socket.on("sendMessage", async(messageData, userAddress) => {
+    let recipient;
+    try {
+      recipient = await User.findOne({ userAddress: userAddress });      
+    } catch (error) {
+      console.error("Error fetching recipient: ", error);
+    }
+
+    if(recipient && recipient.isActive) {;
+      socket.to(recipient.socketId).emit("receiveMessage", messageData);
+    }
+  });
+
+  socket.on("disconnect", async () => {
+    console.log("User disconnected:", socket.id);
+    try {
+      await User.findOneAndUpdate(
+        { socketId: socket.id },
+        { socketId: "", isActive: false }
+      );
+
+      console.log(`User with socketId ${socket.id} is now inactive`);
+    } catch (error) {
+      console.error("Error in user disconnect status update:", error);
+    }
+  });
+});
+
 
 app.post("/api/circle/:type", async (req: Request, res: Response) => {
   console.log();
@@ -72,6 +127,6 @@ app.get("/api/test", (req: Request, res: Response) => {
   });
 })
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
