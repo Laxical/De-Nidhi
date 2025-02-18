@@ -44,6 +44,7 @@ export default function TabsLayout() {
         <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" />
             <Stack.Screen name="chats" />
+            <Stack.Screen name="chatscreen" />
             <Stack.Screen name="profile" />
             <Stack.Screen name="transactions" />
         </Stack>

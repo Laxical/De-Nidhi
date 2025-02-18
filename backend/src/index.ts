@@ -53,6 +53,8 @@ io.on("connection", async (socket) => {
       console.error("Error fetching recipient: ", error);
     }
 
+    console.log("here " + recipient);
+
     if(recipient && recipient.isActive) {;
       socket.to(recipient.socketId).emit("receiveMessage", messageData);
     }
