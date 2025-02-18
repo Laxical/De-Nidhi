@@ -5,9 +5,10 @@ import { Link } from "expo-router"
 import { useEffect, useState } from "react"
 import { Pressable, Text, View, SafeAreaView, ScrollView, Linking } from "react-native"
 import { StatusBar } from "expo-status-bar"
-import { Ionicons } from "@expo/vector-icons"
 import Constants from "expo-constants"
 import { ETHERSCAN_API_KEY, USDC_ADDRESS, BACKEND_URL } from '@env';
+import "react-native-get-random-values";
+import "react-native-url-polyfill/auto";
 
 
 export default function Page() {
@@ -56,12 +57,10 @@ export default function Page() {
   };
 
   const fetchUsdcBalance = async (address) => {
-    console.log("here");
     try {
       const response = await fetch(`https://api-sepolia.etherscan.io/api?module=account&action=tokenbalance&contractaddress=${USDC_ADDRESS}&address=${address}&tag=latest&apikey=${ETHERSCAN_API_KEY}`);
 
       const data = await response.json();
-      console.log(data);
 
       if (data.status === "1") {
         const balance = data.result;
@@ -79,7 +78,6 @@ export default function Page() {
   };
 
   useEffect(() => {
-    console.log(user);
     if (user) {
       fetchUsdcBalance(user.linked_accounts[1].address);
     }
@@ -133,27 +131,6 @@ export default function Page() {
           )}
         </View>
       </ScrollView>
-
-      <View className="flex-row justify-around py-4 bg-white border-t border-gray-200">
-        <Link href="/" asChild>
-          <Pressable className="items-center">
-            <Ionicons name="home" size={24} color="black" />
-            <Text className="text-xs mt-1">Home</Text>
-          </Pressable>
-        </Link>
-        <Link href="/transactions" asChild>
-          <Pressable className="items-center">
-            <Ionicons name="list-outline" size={24} color="black" />
-            <Text className="text-xs mt-1">Transactions</Text>
-          </Pressable>
-        </Link>
-        <Link href="/profile" asChild>
-          <Pressable className="items-center">
-            <Ionicons name="person-outline" size={24} color="black" />
-            <Text className="text-xs mt-1">Profile</Text>
-          </Pressable>
-        </Link>
-      </View>
     </SafeAreaView>
   )
 }

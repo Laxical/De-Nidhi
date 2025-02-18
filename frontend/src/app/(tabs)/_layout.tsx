@@ -1,25 +1,11 @@
-"use client"
-
-import { useLogin, usePrivy } from "@privy-io/expo"
+import { Stack } from "expo-router";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { Pressable, Text, View } from "react-native"
 import { Link } from "expo-router"
-import { useEffect } from "react"
-import { Pressable, Text, View, SafeAreaView, ScrollView } from "react-native"
-import { StatusBar } from "expo-status-bar"
-import { Ionicons } from "@expo/vector-icons"
-import Constants from "expo-constants"
 
-export default function Transactions() {
-  const { user } = usePrivy()
-
-  return (
-    <SafeAreaView className="flex-1 bg-gray-100">
-      <StatusBar style="dark" />
-      <View style={{ height: Constants.statusBarHeight }} className="bg-gray-100" />
-      <ScrollView className="flex-1">
-        <View className="p-6">
-          <Text className="text-4xl font-bold text-blue-600 mb-6">Transactions</Text>
-        </View>
-      </ScrollView>
+function TabLayout() {
+    return (
       <View className="flex-row justify-around py-4 bg-white border-t border-gray-200">
         <Link href="/" asChild>
           <Pressable className="items-center">
@@ -40,6 +26,18 @@ export default function Transactions() {
           </Pressable>
         </Link>
       </View>
-    </SafeAreaView>
-  )
+    );
+}
+
+export default function TabsLayout() {
+  return(
+    <SafeAreaProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="profile" />
+            <Stack.Screen name="transactions" />
+        </Stack>
+        <TabLayout />
+    </SafeAreaProvider>
+  );
 }
