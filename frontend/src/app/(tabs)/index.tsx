@@ -8,11 +8,11 @@ import { StatusBar } from "expo-status-bar"
 import { Ionicons } from "@expo/vector-icons"
 import Constants from "expo-constants"
 import { ETHERSCAN_API_KEY, USDC_ADDRESS, BACKEND_URL } from '@env';
+import provider from "@/config/etherconfig"
 export default function Page() {
   const [usdcBalance, setUsdcBalance] = useState(null);
   const { user, logout } = usePrivy()
   const { login } = useLogin()
-
 
   const handleAuthAction = async () => {
     if (user) {
@@ -53,12 +53,25 @@ export default function Page() {
       console.error("Error creating ramp session:", error);
     }
   };
+  const ENSname = async () => {
+    console.log("Calling ENS lookup...");
+    try {
+      const wallet ="0x487a30c88900098b765d76285c205c7c47582512"
+  //  const address = await provider.lookupAddress(wallet);
 
+  
+  //  const resolver=await provider.getResolver(address);
+  //  console.log(resolver);
+  const address=await provider.resolveName("sendou.eth")
+      console.log("ENS Name result:", address);
+    } catch(error) {
+      console.log(error)
+    }
+  }
   const fetchUsdcBalance = async (address) => {
     console.log("here");
     try {
       const response = await fetch(`https://api-sepolia.etherscan.io/api?module=account&action=tokenbalance&contractaddress=${USDC_ADDRESS}&address=${address}&tag=latest&apikey=${ETHERSCAN_API_KEY}`);
-
       const data = await response.json();
       console.log(data);
 
@@ -71,7 +84,7 @@ export default function Page() {
     } catch (error) {
       console.error("Error fetching USDC balance:", error);
     }
-  };
+  };``
 
   const handleSendUSDC = async () => {
 
@@ -121,6 +134,7 @@ export default function Page() {
           >
             <Text className="text-white text-center font-semibold">{user ? "Logout" : "Login"}</Text>
           </Pressable>
+         
 
           {user && (
             <View className="mt-8">
@@ -131,6 +145,12 @@ export default function Page() {
             </View>
           )}
         </View>
+        <Pressable
+          onPress={ENSname}
+          >
+            <Text>get name</Text>
+            
+          </Pressable>
       </ScrollView>
 
 
