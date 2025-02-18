@@ -7,7 +7,7 @@ import { Pressable, Text, View, SafeAreaView, ScrollView, Linking } from "react-
 import { StatusBar } from "expo-status-bar"
 import { Ionicons } from "@expo/vector-icons"
 import Constants from "expo-constants"
-import { ETHERSCAN_API_KEY, USDC_ADDRESS } from '@env';
+import { ETHERSCAN_API_KEY, USDC_ADDRESS, BACKEND_URL } from '@env';
 
 
 export default function Page() {
@@ -30,7 +30,7 @@ export default function Page() {
 
   const handleBuyUSDC = async () => {
     try {
-      const response = await fetch("http://10.1.8.239:5000/api/circle/BUY", {
+      const response = await fetch(`${BACKEND_URL}/api/circle/BUY`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
