@@ -5,10 +5,12 @@ import { Link } from "expo-router"
 import { useEffect, useState } from "react"
 import { Pressable, Text, View, SafeAreaView, ScrollView, Linking } from "react-native"
 import { StatusBar } from "expo-status-bar"
-import { Ionicons } from "@expo/vector-icons"
-import Constants from "expo-constants"
 import { ETHERSCAN_API_KEY, USDC_ADDRESS, BACKEND_URL } from '@env';
+import "react-native-get-random-values";
+import "react-native-url-polyfill/auto";
 import provider from "@/config/etherconfig"
+
+
 export default function Page() {
   const [usdcBalance, setUsdcBalance] = useState(null);
   const { user, logout } = usePrivy()
@@ -69,11 +71,9 @@ export default function Page() {
     }
   }
   const fetchUsdcBalance = async (address) => {
-    console.log("here");
     try {
       const response = await fetch(`https://api-sepolia.etherscan.io/api?module=account&action=tokenbalance&contractaddress=${USDC_ADDRESS}&address=${address}&tag=latest&apikey=${ETHERSCAN_API_KEY}`);
       const data = await response.json();
-      console.log(data);
 
       if (data.status === "1") {
         const balance = data.result;
@@ -91,8 +91,7 @@ export default function Page() {
   };
 
   useEffect(() => {
-    console.log(user);
-    if (user && user.linked_accounts[1]?.type === "email") {
+    if (user) {
       fetchUsdcBalance(user.linked_accounts[1].address);
     }
   },[user]);
@@ -100,7 +99,6 @@ export default function Page() {
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
       <StatusBar style="dark" />
-      <View style={{ height: Constants.statusBarHeight }} className="bg-gray-100" />
       <ScrollView className="flex-1">
         <View className="p-6">
           <Text className="text-4xl font-bold text-blue-600 mb-6">De-Nidhi</Text>
@@ -152,8 +150,6 @@ export default function Page() {
             
           </Pressable>
       </ScrollView>
-
-
     </SafeAreaView>
   )
 }
