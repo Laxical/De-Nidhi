@@ -27,9 +27,11 @@ export default function RootLayout() {
       }}
     >
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
+        {/* <Stack.Screen name="index" />
         <Stack.Screen name="transactions" />
-        <Stack.Screen name="profile" />
+        <Stack.Screen name="profile" /> */}
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name='+not-found'/>
       </Stack>
       <PrivyElements />
     </PrivyProvider>

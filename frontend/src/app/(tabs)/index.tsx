@@ -8,12 +8,13 @@ import { StatusBar } from "expo-status-bar"
 import { Ionicons } from "@expo/vector-icons"
 import Constants from "expo-constants"
 import { ETHERSCAN_API_KEY, USDC_ADDRESS, BACKEND_URL } from '@env';
-
+import { useEnsName } from 'wagmi'
 
 export default function Page() {
   const [usdcBalance, setUsdcBalance] = useState(null);
   const { user, logout } = usePrivy()
   const { login } = useLogin()
+
 
   const handleAuthAction = async () => {
     if (user) {
@@ -80,7 +81,7 @@ export default function Page() {
 
   useEffect(() => {
     console.log(user);
-    if (user) {
+    if (user && user.linked_accounts[1]?.type === "email") {
       fetchUsdcBalance(user.linked_accounts[1].address);
     }
   },[user]);
@@ -134,26 +135,7 @@ export default function Page() {
         </View>
       </ScrollView>
 
-      <View className="flex-row justify-around py-4 bg-white border-t border-gray-200">
-        <Link href="/" asChild>
-          <Pressable className="items-center">
-            <Ionicons name="home" size={24} color="black" />
-            <Text className="text-xs mt-1">Home</Text>
-          </Pressable>
-        </Link>
-        <Link href="/transactions" asChild>
-          <Pressable className="items-center">
-            <Ionicons name="list-outline" size={24} color="black" />
-            <Text className="text-xs mt-1">Transactions</Text>
-          </Pressable>
-        </Link>
-        <Link href="/profile" asChild>
-          <Pressable className="items-center">
-            <Ionicons name="person-outline" size={24} color="black" />
-            <Text className="text-xs mt-1">Profile</Text>
-          </Pressable>
-        </Link>
-      </View>
+
     </SafeAreaView>
   )
 }
