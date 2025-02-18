@@ -5,7 +5,6 @@ import { Link } from "expo-router"
 import { useEffect, useState } from "react"
 import { Pressable, Text, View, SafeAreaView, ScrollView, Linking } from "react-native"
 import { StatusBar } from "expo-status-bar"
-import Constants from "expo-constants"
 import { ETHERSCAN_API_KEY, USDC_ADDRESS, BACKEND_URL } from '@env';
 import "react-native-get-random-values";
 import "react-native-url-polyfill/auto";
@@ -86,7 +85,6 @@ export default function Page() {
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
       <StatusBar style="dark" />
-      <View style={{ height: Constants.statusBarHeight }} className="bg-gray-100" />
       <ScrollView className="flex-1">
         <View className="p-6">
           <Text className="text-4xl font-bold text-blue-600 mb-6">De-Nidhi</Text>

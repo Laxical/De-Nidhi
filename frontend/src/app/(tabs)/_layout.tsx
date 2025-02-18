@@ -3,6 +3,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Pressable, Text, View } from "react-native"
 import { Link } from "expo-router"
+import Constants from "expo-constants"
 
 function TabLayout() {
     return (
@@ -32,6 +33,7 @@ function TabLayout() {
 export default function TabsLayout() {
   return(
     <SafeAreaProvider>
+        <View style={{ height: Constants.statusBarHeight }} className="bg-gray-100" />
         <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" />
             <Stack.Screen name="profile" />
