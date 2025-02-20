@@ -6,6 +6,7 @@ import {useFonts} from 'expo-font';
 import Constants from "expo-constants";
 import { SafeAreaView, View } from "react-native";
 import "../global.css";
+import { sepolia } from 'viem/chains';
 
 export default function RootLayout() {
   useFonts({
@@ -23,8 +24,10 @@ export default function RootLayout() {
           ethereum: { 
             createOnLogin: 'users-without-wallets',
           }, 
+
         }, 
       }}
+      supportedChains={[sepolia]}
     >
       <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

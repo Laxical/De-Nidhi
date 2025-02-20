@@ -58,14 +58,14 @@ export default function Page() {
   const ENSname = async () => {
     console.log("Calling ENS lookup...");
     try {
-      const wallet ="0x487a30c88900098b765d76285c205c7c47582512"
-  //  const address = await provider.lookupAddress(wallet);
+      const wallet ="0xFED6a969AaA60E4961FCD3EBF1A2e8913ac65B72"
+   const address = await provider.lookupAddress(wallet);
 
   
-  //  const resolver=await provider.getResolver(address);
-  //  console.log(resolver);
-  const address=await provider.resolveName("sendou.eth")
-      console.log("ENS Name result:", address);
+   const resolver=await provider.getResolver(address);
+   console.log(resolver);
+  // const address=await provider.resolveName("sendou.eth")
+  //     console.log("ENS Name result:", address);
     } catch(error) {
       console.log(error)
     }

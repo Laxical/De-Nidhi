@@ -15,6 +15,7 @@
     "@privy-io/expo-native-extensions": "^0.0.3",
     "@react-native-picker/picker": "^2.11.0",
     "ethers": "^6.13.5",
+    "ethers5": "npm:ethers@5.7",
     "expo": "~52.0.27",
     "expo-application": "~6.0.2",
     "expo-constants": "~17.0.6",
@@ -45,6 +46,7 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@types/react": "~18.3.12",
+    "@types/react-native": "^0.72.8",
     "typescript": "~5.3.3"
   },
   "private": true

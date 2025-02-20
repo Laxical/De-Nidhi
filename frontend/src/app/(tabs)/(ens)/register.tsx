@@ -1,104 +1,130 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Pressable, SafeAreaView, Alert } from "react-native";
-import { ethers } from "ethers";
-import { ETHRegister, provider } from "../../../config/etherconfig";
-import {EIP1193Provider, usePrivy } from "@privy-io/expo"
+import { ethers } from "ethers5";
+import { ETHRegister } from "../../../config/etherconfig";
+import { usePrivy } from "@privy-io/expo";
 import { Picker } from '@react-native-picker/picker';
 import { useEmbeddedEthereumWallet } from "@privy-io/expo";
-import { sign } from "viem/_types/accounts/utils/sign";
 
 export default function RegisterENS() {
   const [ensName, setEnsName] = useState("");
-  const [period,setPeriod]=useState(31536000);
-  const [price,setPrice]=useState(0)
-  const registrarController = new ethers.Contract(ETHRegister.address, ETHRegister.abi, provider);
+  const [period, setPeriod] = useState(31536000);
+  const [price, setPrice] = useState(0);
+  const [isCommitComplete, setIsCommitComplete] = useState(false); // New state variable
   const { user, logout } = usePrivy();
-  const resolver_address="0x8FADE66B79cC9f707aB26799354482EB93a5B7dD"
-  const {isReady} = usePrivy();
-  const {wallets} = useEmbeddedEthereumWallet();
-  if (wallets.length === 0) {
-    // The user has no embedded ethereum wallets
-    return null;
-  }
+  const resolver_address = "0x8FADE66B79cC9f707aB26799354482EB93a5B7dD";
+  const [secret,setSecret]=useState("");
+  const { isReady } = usePrivy();
+  const { wallets } = useEmbeddedEthereumWallet();
   const wallet = wallets[0];
-  const wallet_address=wallet.address;
-  const signMessage=async()=>{
-    const privyProvider:EIP1193Provider=await wallet.getProvider();
-    console.log(privyProvider);
+  const wallet_address = wallet.address;
 
-
-  }
-  signMessage();
-
-  // Function to handle form submission
+  // Function to handle the commit step
   const handleCommit = async () => {
     if (ensName.trim() === "") {
       Alert.alert("Error", "ENS name cannot be empty");
     } else {
       try {
-        const isAvailable = await registrarController.available(ensName);
-        console.log(isAvailable);
+        const provider = await wallet.getProvider();
+        const ethersProvider = new ethers.providers.Web3Provider(provider);
+        const ethersSigner = ethersProvider.getSigner();
 
-        if(!isAvailable){
+        const registrarController = new ethers.Contract(ETHRegister.address, ETHRegister.abi, ethersSigner);
+        const isAvailable = await registrarController.available(ensName);
+        if (!isAvailable) {
           Alert.alert(`The name ${ensName} is already taken`);
           setEnsName("");
+          return;
         }
-        console.log("walletADDRESS",wallet_address);
-        const randomByte32 = ethers.hexlify(ethers.randomBytes(32));
+        console.log("avalaibility",isAvailable);
+
+        const randomByte32 = ethers.utils.hexlify(ethers.utils.randomBytes(32));
+        setSecret(randomByte32);
+
         const result = await registrarController.makeCommitment(
-          ensName, 
+          ensName,
           wallet_address,
           period,
           randomByte32,
           resolver_address,
-          [], 
-          false, 
+          [],
+          true,
           0
         );
-        const commitmentHex = ethers.hexlify(result);
-        console.log("Commitment Hash:", commitmentHex);
-              // Send the commit transaction
-      const commitTx = await registrarController.commit(commitmentHex);
-      console.log("Timer start");
-            // Wait for the transaction to be mined with 1 confirmation (default)
-      const commitReceipt = await provider.waitForTransaction(commitTx.hash, 1, 60000); // 60 seconds timeout
-      if (commitReceipt === null) {
-        Alert.alert("Error", "Commitment transaction not mined in time.");
-        return;
-      }
-      console.log("Timer stop");
-      const price = await registrarController.rentPrice(ensName, period);
-      const formattedPrice = ethers.formatUnits(price, 18);
-      setPrice(Number(formattedPrice));
-  
+
+        const commitmentHex = ethers.utils.hexlify(result);
+        const commitTx = await registrarController.commit(commitmentHex);
+        console.log("commit hash",commitTx.hash);
+        console.log("timer start");
+        const commitReceipt = await ethersSigner.provider.waitForTransaction(commitTx.hash, 1, 60000);
+        console.log("timer end");
+
+        if (commitReceipt === null) {
+          Alert.alert("Error", "Commitment transaction not mined in time.");
+          return;
+        }
+
+        // Fetch the price
+        const priceArray = await registrarController.rentPrice(ensName, period);
+        const basePrice = priceArray[0];
+        const additionalFee = priceArray[1] || 0; // Handle if additionalFee doesn't exist
+        const formattedBasePrice = ethers.utils.formatUnits(basePrice, 18);
+        const formattedAdditionalFee = ethers.utils.formatUnits(additionalFee, 18);
+        const totalPrice = Number(formattedBasePrice) + Number(formattedAdditionalFee);
+
+        setPrice(totalPrice);
+        setIsCommitComplete(true); // Mark the commit as complete
+
       } catch (error) {
-        console.error("Error checking availability:", error);
+        console.error("Error checking availability or committing:", error);
         Alert.alert("Error", "Something went wrong while checking availability.");
       }
     }
   };
-  const handleRegister=async()=>{
-    const registerTx=await registrarController.register(
-      ensName,
-      wallet_address,
-      period,
-      0x0000000000000000000000000000000000000000000000000000000000000000,
-      resolver_address,
-      [],
-      false,
-      0
-    )
-    const commitReceipt = await provider.waitForTransaction(registerTx.hash, 1, 60000); // 60 seconds timeout
-    console.log(commitReceipt);
-    const ENSname = await provider.lookupAddress(wallet_address);
-    console.log(ENSname);
-  }
-  if (!isReady) return (
-    <View>
-      <Text>
-          Loggin First
-      </Text>
-    </View>);
+
+  // Function to handle the registration step
+  const handleRegister = async () => {
+    try {
+      const provider = await wallet.getProvider();
+      await provider.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0xaa36a7' }],
+      });
+
+      const ethersProvider = new ethers.providers.Web3Provider(provider);
+      const ethersSigner = ethersProvider.getSigner();
+      const registrarController = new ethers.Contract(ETHRegister.address, ETHRegister.abi, ethersSigner);
+      const amount = (price * 1.05).toFixed(18); // Add 5% buffer
+      console.log(amount);
+      console.log(wallet_address);
+
+      const registerTx = await registrarController.register(
+        ensName,
+        wallet_address,
+        period,
+        secret,
+        resolver_address,
+        [],
+        true,
+        0,
+        {
+          value:ethers.utils.parseEther(amount),
+          gasLimit: 500000 // Explicit gas limit
+
+        },
+      );
+
+      const registerReceipt = await ethersSigner.provider.waitForTransaction(registerTx.hash, 1, 60000);
+      console.log(registerReceipt);
+
+      const ENSname = await ethersSigner.provider.lookupAddress(wallet_address);
+      console.log("Registered ENS Name:", ENSname);
+
+    } catch (error) {
+      console.error("Error in handleRegister:", error);
+      Alert.alert("Error", "Something went wrong during registration.");
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
@@ -123,22 +149,24 @@ export default function RegisterENS() {
             <Picker.Item label="2 Years" value={63072000} />
           </Picker>
         </View>
-         {/* Price Display */}
-        {price && (
+
+        {/* Price Display */}
+        {price > 0 && (
           <Text className="text-xl text-green-600 mb-4">
             Price: {price} ETH
           </Text>
         )}
 
-        {/* Submit button */}
+        {/* Submit button changes to Confirm button once price is set */}
         <Pressable
           className="bg-blue-500 p-3 rounded-lg shadow-lg active:bg-blue-600"
-          onPress={handleCommit}
+          onPress={isCommitComplete ? handleRegister : handleCommit}
         >
-          <Text className="text-white text-center">Submit</Text>
+          <Text className="text-white text-center">
+            {isCommitComplete ? "Confirm" : "Submit"}
+          </Text>
         </Pressable>
       </View>
-
     </SafeAreaView>
   );
 }
