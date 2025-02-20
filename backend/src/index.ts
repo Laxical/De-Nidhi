@@ -11,7 +11,6 @@ import { authenticateUser } from "./middlewares/privyAuthMiddleware";
 import chatController from "./controllers/chatController"
 import userController from "./controllers/userController";
 import circleController from "./controllers/circleController";
-import usdcController from "./controllers/usdcController";
 
 dotenv.config();
 
@@ -41,7 +40,6 @@ app.use(cookieParser());
 
 app.use("/api/chat", authenticateUser, chatController)
 app.use("/api/user", authenticateUser, userController)
-app.use("/api/USDC", authenticateUser, usdcController)
 app.use("/api/circle", circleController)
 
 app.get("/api/test", (req: Request, res: Response) => {
