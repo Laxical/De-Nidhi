@@ -14,6 +14,11 @@ export default function Profile() {
         <View className="p-6">
           <Text className="text-4xl font-bold text-blue-600 mb-6">Profile</Text>
         </View>
+        <Pressable className="">
+          <Text>
+            Register ENS
+          </Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   )
