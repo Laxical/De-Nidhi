@@ -3,8 +3,7 @@ import { Request, Response } from "express";
 
 const circleController = express.Router();
 
-circleController.post("/api/circle/:type", async (req: Request, res: Response) => {
-    console.log();
+circleController.post("/:type", async (req: Request, res: Response) => {
     const type = req.params.type.toUpperCase();
     const { userAddress } = req.body;
   

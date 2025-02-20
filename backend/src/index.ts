@@ -5,15 +5,17 @@ import mongoose from "mongoose";
 import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
+
 import { setupSocket } from "./config/socket";
 import { authenticateUser } from "./middlewares/privyAuthMiddleware";
 import chatController from "./controllers/chatController"
 import userController from "./controllers/userController";
 import circleController from "./controllers/circleController";
+import usdcController from "./controllers/usdcController";
 
 dotenv.config();
-mongoose.connect(process.env.MONGO_URI || "");
 
+mongoose.connect(process.env.MONGO_URI || "");
 const db = mongoose.connection;
 
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
@@ -39,6 +41,7 @@ app.use(cookieParser());
 
 app.use("/api/chat", authenticateUser, chatController)
 app.use("/api/user", authenticateUser, userController)
+app.use("/api/USDC", authenticateUser, usdcController)
 app.use("/api/circle", circleController)
 
 app.get("/api/test", (req: Request, res: Response) => {

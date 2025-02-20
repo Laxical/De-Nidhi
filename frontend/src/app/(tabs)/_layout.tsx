@@ -47,6 +47,7 @@ export default function TabsLayout() {
             <Stack.Screen name="chatscreen" />
             <Stack.Screen name="profile" />
             <Stack.Screen name="transactions" />
+            <Stack.Screen name="sendUSDC" />
         </Stack>
         <TabLayout />
     </SafeAreaProvider>

@@ -1,12 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { View, Text, TextInput, FlatList, SafeAreaView, TouchableOpacity } from "react-native"
+import { View, Text, TextInput, FlatList, SafeAreaView, TouchableOpacity, Pressable } from "react-native"
 import { StatusBar } from "expo-status-bar"
 import { useEmbeddedEthereumWallet, usePrivy, useIdentityToken } from "@privy-io/expo"
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router"
 import { useSocket } from "../../config/socket"
-import { BACKEND_URL } from '@env';
+import { BACKEND_URL } from '@env'
+import { useNavigation } from "expo-router"
+import { Ionicons } from "@expo/vector-icons"
 
 
 export default function Chatscreen() {
@@ -17,6 +19,7 @@ export default function Chatscreen() {
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
   const { getIdentityToken } = useIdentityToken()
+  const navigation = useNavigation()
 
   useEffect(() => {
     fetchChat()
@@ -73,6 +76,9 @@ export default function Chatscreen() {
       <StatusBar style="dark" />
 
       <View className="mb-4">
+        <Pressable onPress={() => navigation.goBack()} className="mr-4">
+          <Ionicons name="arrow-back" size={24} color="black" />
+        </Pressable>
         <Text className="text-2xl font-bold text-blue-600">{selectedFriend}</Text>
       </View>
 
