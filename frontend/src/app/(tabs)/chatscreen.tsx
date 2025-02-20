@@ -3,22 +3,26 @@
 import { useState, useEffect } from "react"
 import { View, Text, TextInput, FlatList, SafeAreaView, TouchableOpacity } from "react-native"
 import { StatusBar } from "expo-status-bar"
-import { useEmbeddedEthereumWallet, usePrivy } from "@privy-io/expo"
+import { useEmbeddedEthereumWallet, usePrivy, useIdentityToken } from "@privy-io/expo"
 import { useLocalSearchParams } from "expo-router";
 import { useSocket } from "../../config/socket"
+import { BACKEND_URL } from '@env';
+
 
 export default function Chatscreen() {
+  const { getAccessToken } = usePrivy()
   const socket = useSocket();
   const user = useEmbeddedEthereumWallet()
   const { selectedFriend } = useLocalSearchParams() 
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
+  const { getIdentityToken } = useIdentityToken();
 
   useEffect(() => {
+    fetchChat()
     socket.on("receiveMessage", (messageData) => {
       if (messageData.sender === selectedFriend) {
         setMessages((prevMessages) => [...prevMessages, messageData])
-        console.log("here");
       }
     })
 
@@ -27,10 +31,38 @@ export default function Chatscreen() {
     }
   }, [selectedFriend])
 
+  const fetchChat = async () => {
+    if (!user) return;
+    
+    try {
+      const identityToken = await getIdentityToken();
+      const token = await getAccessToken();
+      
+      const response = await fetch(`${BACKEND_URL}/api/getChats/${selectedFriend}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          "privy-id-token": identityToken
+        }
+      });
+  
+      const data = await response.json();
+      
+      if (response.ok) {
+        setMessages(data.chatHistory);
+      } else {
+        console.error("Failed to fetch chats:", data.error);
+      }
+    } catch (error) {
+      console.error("Error fetching chat history:", error);
+    }
+  };
+
   const sendMessage = () => {
     if (message.trim() && selectedFriend) {
-      const newMessage = { text: message, sender: user.wallets[0].address }
-      socket.emit("sendMessage", newMessage, selectedFriend)
+      const newMessage = { text: message, sender: user.wallets[0].address, recipient: selectedFriend }
+      socket.emit("sendMessage", newMessage)
       setMessages((prevMessages) => [...prevMessages, newMessage])
       setMessage("")
     }
@@ -73,4 +105,3 @@ export default function Chatscreen() {
     </SafeAreaView>
   )
 }
-

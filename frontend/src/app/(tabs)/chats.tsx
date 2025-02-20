@@ -18,7 +18,6 @@ export default function Chats() {
   }
 
   const navigateToChat = (selectedFriend) => {
-    console.log(selectedFriend)
     router.push(`/chatscreen?selectedFriend=${encodeURIComponent(selectedFriend)}`)
   }
 
