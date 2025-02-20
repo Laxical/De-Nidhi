@@ -56,6 +56,7 @@ export default function Page() {
       console.error("Error creating ramp session:", error);
     }
   };
+  
   const ENSname = async () => {
     console.log("Calling ENS lookup...");
     try {

@@ -6,6 +6,7 @@ import {useFonts} from 'expo-font';
 import Constants from "expo-constants";
 import { SafeAreaView, View } from "react-native";
 import "../global.css";
+import { SocketProvider } from "../config/socket";
 
 export default function RootLayout() {
   useFonts({
@@ -26,10 +27,12 @@ export default function RootLayout() {
         }, 
       }}
     >
-      <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name='+not-found'/>
-      </Stack>
+        <SocketProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name='+not-found'/>
+          </Stack>
+        </SocketProvider>
       <PrivyElements />
     </PrivyProvider>
   );

@@ -1,13 +1,22 @@
 import express, { Request, Response } from "express";
+import cookieParser from "cookie-parser"
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
 import User from "./schema/userSchema";
+import Chat from "./schema/chatSchema";
+import { PrivyClient } from "@privy-io/server-auth"
+import { authenticateUser } from "./middlewares/privyAuthMiddleware";
 
 dotenv.config();
 mongoose.connect(process.env.MONGO_URI || "");
+const privy = new PrivyClient(
+  process.env.PRIVY_APP_ID as string,
+  process.env.PRIVY_APP_SECRET as string,
+);
+
 
 const db = mongoose.connection;
 
@@ -22,11 +31,13 @@ const PORT = process.env.PORT || 5000;
 const io = new Server(server, {
   cors: {
     origin: "*",
+    credentials: true,
   },
 });
 
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 
 io.on("connection", async (socket) => {
   console.log("A user connected:", socket.id);
@@ -45,16 +56,28 @@ io.on("connection", async (socket) => {
     }
   });
 
-  socket.on("sendMessage", async(messageData, userAddress) => {
+  socket.on("sendMessage", async(messageData) => {
     let recipient;
     try {
-      recipient = await User.findOne({ userAddress: userAddress });      
+      recipient = await User.findOne({ userAddress: messageData.recipient });
     } catch (error) {
       console.error("Error fetching recipient: ", error);
     }
 
-    if(recipient && recipient.isActive) {;
-      socket.to(recipient.socketId).emit("receiveMessage", messageData);
+    // console.log("here " + recipient);
+
+    const chat = new Chat({
+      sender: messageData.sender,
+      recipient: messageData.recipient,
+      text: messageData.text,
+    });
+
+    const newChat = await chat.save();
+
+    console.log(newChat);
+
+    if(recipient && recipient.isActive) {
+      socket.to(recipient.socketId).emit("receiveMessage", newChat);
     }
   });
 
@@ -73,7 +96,33 @@ io.on("connection", async (socket) => {
   });
 });
 
+app.get("/api/getChats/:friendAddress", authenticateUser, async (req: Request, res: Response): Promise<void> => {
+  const { idToken } = req;
+  const { friendAddress } = req.params;
 
+  try {
+    const user = await privy.getUser({ idToken });
+
+    if (!user || !user.wallet?.address) {
+      res.status(401).json({ error: "Unauthorized: Invalid user." });
+    }
+
+    const userAddress = user.wallet?.address;
+
+    const chatHistory = await Chat.find({
+      $or: [
+        { sender: userAddress, recipient: friendAddress },
+        { sender: friendAddress, recipient: userAddress },
+      ],
+    }).sort({ createdAt: 1 });
+
+    res.status(200).json({ chatHistory });
+  } catch (error) {
+    console.error("Error fetching chat history:", error);
+    res.status(500).json({ error: "Failed to retrieve chat history." });
+  }
+});
+ 
 app.post("/api/circle/:type", async (req: Request, res: Response) => {
   console.log();
   const type = req.params.type.toUpperCase();
