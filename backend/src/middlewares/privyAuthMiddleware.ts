@@ -1,13 +1,8 @@
-import { PrivyClient } from "@privy-io/server-auth"
 import dotenv from "dotenv"
 import { Request, Response, NextFunction } from "express"
+import privy from "../config/privyConfig"
 
 dotenv.config()
-
-const PRIVY_APP_ID = process.env.PRIVY_APP_ID as string
-const PRIVY_APP_SECRET = process.env.PRIVY_APP_SECRET as string
-
-const privy = new PrivyClient(PRIVY_APP_ID, PRIVY_APP_SECRET)
 
 declare module "express-serve-static-core" {
   interface Request {
@@ -21,7 +16,7 @@ export const authenticateUser = async (req: Request, res: Response, next: NextFu
         const authHeader = req.headers["authorization"]
 
         if (!authHeader || typeof authHeader !== "string") {
-        res.status(401).json({ error: "Unauthorized: No token provided" })
+            res.status(401).json({ error: "Unauthorized: No token provided" })
         }
 
         if(!authHeader) return;

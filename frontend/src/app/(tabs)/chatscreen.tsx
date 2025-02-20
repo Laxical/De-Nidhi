@@ -16,7 +16,7 @@ export default function Chatscreen() {
   const { selectedFriend } = useLocalSearchParams() 
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
-  const { getIdentityToken } = useIdentityToken();
+  const { getIdentityToken } = useIdentityToken()
 
   useEffect(() => {
     fetchChat()
@@ -38,7 +38,7 @@ export default function Chatscreen() {
       const identityToken = await getIdentityToken();
       const token = await getAccessToken();
       
-      const response = await fetch(`${BACKEND_URL}/api/getChats/${selectedFriend}`, {
+      const response = await fetch(`${BACKEND_URL}/api/chat/getChats/${selectedFriend}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
