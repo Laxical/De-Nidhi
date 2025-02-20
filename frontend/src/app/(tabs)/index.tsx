@@ -5,7 +5,7 @@ import { Link } from "expo-router"
 import { useEffect, useState } from "react"
 import { Pressable, Text, View, SafeAreaView, ScrollView, Linking } from "react-native"
 import { StatusBar } from "expo-status-bar"
-import { ETHERSCAN_API_KEY, USDC_ADDRESS, BACKEND_URL } from '@env';
+import { ETHERSCAN_API_KEY, USDC_ADDRESS, BACKEND_URL, ETHERSCAN_URL } from '@env';
 import "react-native-get-random-values";
 import "react-native-url-polyfill/auto";
 import provider from "@/config/etherconfig"
@@ -76,24 +76,21 @@ export default function Page() {
       console.log(error)
     }
   }
+
   const fetchUsdcBalance = async (address) => {
     try {
-      const response = await fetch(`https://api-sepolia.etherscan.io/api?module=account&action=tokenbalance&contractaddress=${USDC_ADDRESS}&address=${address}&tag=latest&apikey=${ETHERSCAN_API_KEY}`);
+      const response = await fetch(`${ETHERSCAN_URL}&contractaddress=${USDC_ADDRESS}&address=${address}&tag=latest&apikey=${ETHERSCAN_API_KEY}`);
       const data = await response.json();
 
       if (data.status === "1") {
         const balance = data.result;
         setUsdcBalance(balance / 1e6);
       } else {
-        console.error("Error fetching balance:", data.message);
+        console.error("Error fetching balance: ", data.message);
       }
     } catch (error) {
-      console.error("Error fetching USDC balance:", error);
+      console.error("Error fetching USDC balance: ", error);
     }
-  };``
-
-  const handleSendUSDC = async () => {
-
   };
 
   useEffect(() => {
@@ -124,6 +121,11 @@ export default function Page() {
             <View className="bg-white rounded-lg shadow-md p-4 mb-6">
               <Text className="text-lg font-semibold mb-2">Welcome, {user.linked_accounts[0].address || "User"}!</Text>
               <Text className="text-gray-600 mb-2">Balance: {usdcBalance} USDC</Text>
+              <Link href="/sendUSDC" asChild>
+                <Pressable className="bg-blue-500 py-2 px-4 rounded-full">
+                  <Text className="text-white text-center font-semibold">Send USDC</Text>
+                </Pressable>
+              </Link>
             </View>
           ) : (
             <View className="bg-white rounded-lg shadow-md p-4 mb-6">
