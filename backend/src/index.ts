@@ -55,7 +55,7 @@ io.on("connection", async (socket) => {
 
     console.log("here " + recipient);
 
-    if(recipient && recipient.isActive) {;
+    if(recipient && recipient.isActive) {
       socket.to(recipient.socketId).emit("receiveMessage", messageData);
     }
   });

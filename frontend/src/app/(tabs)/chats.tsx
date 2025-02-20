@@ -2,28 +2,13 @@
 
 import { useState, useEffect } from "react"
 import { View, Text, TextInput, FlatList, SafeAreaView, TouchableOpacity } from "react-native"
-import { io } from "socket.io-client"
 import { StatusBar } from "expo-status-bar"
-import { usePrivy } from "@privy-io/expo"
-import { BACKEND_URL } from "@env"
-import { useNavigation } from "@react-navigation/native"
 import { useRouter } from "expo-router"
 
-const router = useRouter()
-
-const socket = io(`${BACKEND_URL}`)
-
 export default function Chats() {
-  const { user } = usePrivy()
   const [friends, setFriends] = useState([])
   const [friendAddress, setFriendAddress] = useState("")
-  const navigation = useNavigation()
-
-  useEffect(() => {
-    if (user?.linked_accounts[1]?.address) {
-      socket.emit("register", user.linked_accounts[1].address)
-    }
-  }, [user])
+  const router = useRouter()
 
   const addFriend = () => {
     if (friendAddress.trim() && !friends.includes(friendAddress)) {

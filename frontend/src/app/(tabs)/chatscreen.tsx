@@ -2,16 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { View, Text, TextInput, FlatList, SafeAreaView, TouchableOpacity } from "react-native"
-import { io } from "socket.io-client"
 import { StatusBar } from "expo-status-bar"
-import { usePrivy } from "@privy-io/expo"
-import { BACKEND_URL } from "@env"
+import { useEmbeddedEthereumWallet, usePrivy } from "@privy-io/expo"
 import { useLocalSearchParams } from "expo-router";
-
-const socket = io(`${BACKEND_URL}`)
+import { useSocket } from "../../config/socket"
 
 export default function Chatscreen() {
-  const { user } = usePrivy()
+  const socket = useSocket();
+  const user = useEmbeddedEthereumWallet()
   const { selectedFriend } = useLocalSearchParams() 
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
@@ -20,10 +18,9 @@ export default function Chatscreen() {
     socket.on("receiveMessage", (messageData) => {
       if (messageData.sender === selectedFriend) {
         setMessages((prevMessages) => [...prevMessages, messageData])
+        console.log("here");
       }
     })
-
-    console.log(selectedFriend);
 
     return () => {
       socket.off("receiveMessage")
@@ -32,7 +29,7 @@ export default function Chatscreen() {
 
   const sendMessage = () => {
     if (message.trim() && selectedFriend) {
-      const newMessage = { text: message, sender: user.linked_accounts[1].address }
+      const newMessage = { text: message, sender: user.wallets[0].address }
       socket.emit("sendMessage", newMessage, selectedFriend)
       setMessages((prevMessages) => [...prevMessages, newMessage])
       setMessage("")
@@ -44,7 +41,7 @@ export default function Chatscreen() {
       <StatusBar style="dark" />
 
       <View className="mb-4">
-        <Text className="text-2xl font-bold text-blue-600">Chat with {selectedFriend}</Text>
+        <Text className="text-2xl font-bold text-blue-600">{selectedFriend}</Text>
       </View>
 
       <FlatList
@@ -52,7 +49,7 @@ export default function Chatscreen() {
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View
-            className={`p-3 my-2 rounded-lg ${item.sender === user.linked_accounts[1].address ? "bg-blue-100 self-end" : "bg-gray-200 self-start"}`}
+            className={`p-3 my-2 rounded-lg ${item.sender === user.wallets[0].address ? "bg-blue-100 self-end" : "bg-gray-200 self-start"}`}
           >
             <Text className="text-gray-900">
               {item.sender}: {item.text}
