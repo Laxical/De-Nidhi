@@ -11,11 +11,15 @@ import "react-native-url-polyfill/auto";
 import provider from "@/config/etherconfig"
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-
+import { useCameraPermissions } from 'expo-camera';
+import { useRouter,router } from "expo-router"
+import QRScannerButton from "./scanner/QRScannerButton"
 export default function Page() {
   const [usdcBalance, setUsdcBalance] = useState(null);
   const { user, logout } = usePrivy()
   const { login } = useLogin()
+  const [permission,requestPermission]=useCameraPermissions();
+  const isPermissiongranted=Boolean(permission?.granted); 
 
   const handleAuthAction = async () => {
     if (user) {
@@ -105,15 +109,21 @@ export default function Page() {
         <View className="p-6">
           <Text className="text-4xl font-bold text-blue-600 mb-6">De-Nidhi</Text>
 
+          {user && (
+            <View className="items-center p-4 mb-6">
+                 <Text className="text-lg font-medium mb-4">Scan To Pay</Text>
+                 <QRScannerButton />
+              <Text className="text-xs text-gray-500 mt-2 text-center">
+                {user.linked_accounts[0].address.slice(0, 6)}...{user.linked_accounts[0].address.slice(-4)}
+              </Text>
+            </View>
+          )}
+
+          {/* User Profile Section */}
           {user ? (
             <View className="bg-white rounded-lg shadow-md p-4 mb-6">
               <Text className="text-lg font-semibold mb-2">Welcome, {user.linked_accounts[0].address || "User"}!</Text>
               <Text className="text-gray-600 mb-2">Balance: {usdcBalance} USDC</Text>
-              <Link href="/send-money" asChild>
-                <Pressable className="bg-blue-500 py-2 px-4 rounded-full" onPress={handleSendUSDC}>
-                  <Text className="text-white text-center font-semibold">Send USDC</Text>
-                </Pressable>
-              </Link>
             </View>
           ) : (
             <View className="bg-white rounded-lg shadow-md p-4 mb-6">
@@ -121,21 +131,45 @@ export default function Page() {
             </View>
           )}
 
-          {user && <Pressable
-            onPress={handleBuyUSDC}
-            className={`py-3 px-6 rounded-full bg-green-500 mb-6 mx-10`}
-          >
-            <Text className="text-white text-center font-semibold flex justify-center items-center"><FontAwesome name="dollar" size={14} color="white" /> Buy USDC</Text>
-          </Pressable>}
+          {/* Send USDC Button */}
+          {user && (
+            <Pressable
+              onPress={handleSendUSDC}
+              className="py-3 px-6 rounded-full bg-blue-500 mb-6 mx-10"
+            >
+              <Text className="text-white text-center font-semibold">Send USDC</Text>
+            </Pressable>
+          )}
 
+          {/* Buy USDC Button */}
+          {user && (
+            <Pressable
+              onPress={handleBuyUSDC}
+              className="py-3 px-6 rounded-full bg-green-500 mb-6 mx-10"
+            >
+              <Text className="text-white text-center font-semibold flex justify-center items-center">
+                <FontAwesome name="dollar" size={14} color="white" /> Buy USDC
+              </Text>
+            </Pressable>
+          )}
+
+          {/* Logout/Login Button */}
           <Pressable
             onPress={handleAuthAction}
             className={`py-3 px-6 rounded-full ${user ? "bg-red-500" : "bg-blue-500"}`}
           >
-            <Text className="text-white text-center font-semibold">{user ? (<Text className="flex justify-center items-center"><MaterialIcons name="logout" size={16} color="white" /> Logout</Text>) : "Login"}</Text>
+            <Text className="text-white text-center font-semibold">
+              {user ? (
+                <Text className="flex justify-center items-center">
+                  <MaterialIcons name="logout" size={16} color="white" /> Logout
+                </Text>
+              ) : (
+                "Login"
+              )}
+            </Text>
           </Pressable>
-         
 
+          {/* Recent Activity Section */}
           {user && (
             <View className="mt-8">
               <Text className="text-xl font-semibold mb-4">Recent Activity</Text>
@@ -144,14 +178,14 @@ export default function Page() {
               </View>
             </View>
           )}
-        </View>
-        <Pressable
-          onPress={ENSname}
-          >
-            <Text>get name</Text>
-            
+
+          {/* ENS Name Fetch Button */}
+          <Pressable onPress={ENSname}>
+            <Text>Get ENS Name</Text>
           </Pressable>
+        </View>
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }
+
