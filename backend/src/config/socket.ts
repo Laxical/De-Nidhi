@@ -26,7 +26,12 @@ export const setupSocket = (io: Server) => {
         const chat = new Chat({
           sender: messageData.sender,
           recipient: messageData.recipient,
-          text: messageData.text,
+          text: messageData.text || "",
+          isTransfer: messageData.isTransfer || false,
+          isRequest: messageData.isRequest || false,
+          amount: messageData.amount,
+          transactionHash: messageData.transactionHash,
+          status: false,
         });
 
         const newChat = await chat.save();

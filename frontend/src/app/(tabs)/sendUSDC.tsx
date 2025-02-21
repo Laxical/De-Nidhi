@@ -34,7 +34,7 @@ export default function SendUSDC() {
 
         const ethersProvider = new BrowserProvider(provider);
         const signer = await ethersProvider.getSigner();
-;
+
         const usdcContract = new Contract(USDC_ADDRESS, USDC_ABI, signer); 
         const amountInWei = parseUnits(amount, 6);
 
