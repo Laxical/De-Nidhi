@@ -132,18 +132,7 @@ export default function Page() {
               <Text className="text-lg text-center mb-4">Login to start sending and receiving crypto!</Text>
             </View>
           )}
-
-          {/* Send USDC Button */}
-          {user && (
-            <Pressable
-              onPress={handleSendUSDC}
-              className="py-3 px-6 rounded-full bg-blue-500 mb-6 mx-10"
-            >
-              <Text className="text-white text-center font-semibold">Send USDC</Text>
-            </Pressable>
-          )}
-
-          {/* Buy USDC Button */}
+         {/* Buy USDC Button */}
           {user && (
             <Pressable
               onPress={handleBuyUSDC}
