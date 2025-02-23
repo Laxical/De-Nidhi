@@ -1,12 +1,13 @@
 import {PrivyElements, PrivyProvider} from '@privy-io/expo';
 import {Stack} from 'expo-router';
-import { PRIVY_APP_ID, PRIVY_CLIENT_ID } from '@env';
 import {Inter_400Regular, Inter_500Medium, Inter_600SemiBold} from '@expo-google-fonts/inter';
 import {useFonts} from 'expo-font';
 import Constants from "expo-constants";
 import { SafeAreaView, View } from "react-native";
 import "../global.css";
 import { SocketProvider } from "../config/socket";
+const PRIVY_APP_ID="cm77pogvd00b1tjdpbgq8otwp";
+const PRIVY_CLIENT_ID="client-WY5gxxzsp6hFVYCt3DR8bUgCvr1J2BqN86WpRQdtxpAgr";
 
 export default function RootLayout() {
   useFonts({
